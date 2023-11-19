@@ -19,33 +19,32 @@ const toCommand = x => {
       return 'NOP';
   }
 }
-let top = 0; let left = 0;
-  const actions = {
+let top = 0;
+let left = 0;
+const player = document.querySelector('#player1');
+const gameArea = document.querySelector('#app');
+const actions = {
   'UP': () => {
     top -= 10;
-    document.querySelector('#player1').style.top = `${top}px`;
+    player.style.top = `${top}px`;
   },
   'DOWN': () => {
     top += 10;
-    document.querySelector('#player1').style.top = `${top}px`;
+    player.style.top = `${top}px`;
   },
   'LEFT': () => {
     left -= 10;
-    document.querySelector('#player1').style.left = `${left}px`;
+    player.style.left = `${left}px`;
   },
   'RIGHT': () => {
     left += 10;
-    document.querySelector('#player1').style.left = `${left}px`;
+    player.style.left = `${left}px`;
   },
-  };
-Kefir.fromEvents(document.querySelector('#app'), 'keydown')
-//.filter(x => x.key !== null)
+};
+
+Kefir.fromEvents(gameArea, 'keydown')
 .map(x => x.key)
 .map(toCommand)
 .onValue(x => {
   actions[x] ? actions[x]() : '';
-});//  console.log(x));
-
-// document.getElementById("app").innerHTML = `
-// <h1>Hello Vanilla!</h1>
-// `;
+});
