@@ -15,36 +15,61 @@ const toCommand = x => {
     case('arrowright'):
       return 'RIGHT';
       break;
+    case('c'):
+      return 'ChangeColor:Cyan';
+      break;
     default:
       return 'NOP';
   }
 }
-let top = 0;
-let left = 0;
+const setPosition = (player, location) => {
+    player.style.top = `${location.y}px`;
+    player.style.left = `${location.x}px`;
+}
+
 const player = document.querySelector('#player1');
 const gameArea = document.querySelector('#app');
-const actions = {
-  'UP': () => {
-    top -= 10;
-    player.style.top = `${top}px`;
+const movementActions = {
+  'UP': (p) => {
+    p.y -= 10;
+    return p;
   },
-  'DOWN': () => {
-    top += 10;
-    player.style.top = `${top}px`;
+  'DOWN': (p) => {
+    p.y += 10;
+    return p;
   },
-  'LEFT': () => {
-    left -= 10;
-    player.style.left = `${left}px`;
+  'LEFT': (p) => {
+    p.x -= 10;
+    return p;
   },
-  'RIGHT': () => {
-    left += 10;
-    player.style.left = `${left}px`;
+  'RIGHT': (p) => {
+    p.x += 10;
+    return p;
   },
 };
 
-Kefir.fromEvents(gameArea, 'keydown')
+const colorChangeActions = {
+  'ChangeColor:Cyan': () => 'cyan',
+}
+
+const gameCommands = Kefir.fromEvents(gameArea, 'keydown')
 .map(x => x.key)
 .map(toCommand)
+
+const colorCommands = gameCommands
+.filter(x => ['ChangeColor:Cyan'].indexOf(x) >= 0)
+.scan((p, v) => colorChangeActions[v] ? colorChangeActions[v](): p, 'red')
+
+const movementCommands = gameCommands
+.filter(x => ['UP','DOWN','LEFT','RIGHT'].indexOf(x) >=0)
+.scan((p, v) => { 
+  return movementActions[v] ? movementActions[v](p) : p;
+}, {x: 0, y: 0});
+
+colorCommands
 .onValue(x => {
-  actions[x] ? actions[x]() : '';
+  player.style.backgroundColor = x;
 });
+
+movementCommands
+.onValue(setPosition.bind(null, player));
